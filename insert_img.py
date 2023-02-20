@@ -2,7 +2,7 @@
 #Author: nilecui
 #Date: 2023-02-20 10:54:59
 #LastEditors: nilecui
-#LastEditTime: 2023-02-20 13:21:39
+#LastEditTime: 2023-02-20 13:38:28
 #FilePath: /kafka_wk/docs_table_wk/insert_img.py
 #Description: 
 #Details do not determine success or failure!
@@ -48,34 +48,26 @@ class SaveImgInTable:
             data[d] = image_name
         return data
         
-    def get_all_docs(self):
-        print(self.src_dir)
-        
+    def get_all_docs(self):        
         docs = glob(f'{self.src_dir}/*.docx')
-        print(docs)
         if len(docs) > 0:
             return docs
         return None
 
     def process_docs(self):
         for d, img in self.d_data.items():
-            print("process==>")
-            print(d, img)
             docx = Document(d) #docx文件的地址
             tables = docx.tables # 获取所有表格
             for t in tables:
-                print(dir(t))
                 for r in t.rows:
                     for c in r.cells:
                         for p in c.paragraphs:
-                            print(f"p=>{p.text}")
                             text = p.text
                             if self.has_img_flag(text):
                                 # 插入图片
                                 p.text = p.text.replace('<<img1>>', '')
                                 run = p.add_run('')
                                 run.add_break()
-                                print("=====>"*10)
                                 pic = run.add_picture(img, width=Inches(1.2))
             save_path = d.replace(self.src_dir, self.save_dir)
             docx.save(save_path)
